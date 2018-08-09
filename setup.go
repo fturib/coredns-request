@@ -83,34 +83,42 @@ func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
 	return nil
 }
 
-func (p *requestPlugin) addEDNS0Map(code, name, dataType, sizeStr, startStr, endStr string) error {
+func newEDNS0Map(code, name, dataType, sizeStr, startStr, endStr string) (*edns0Map, error) {
 	c, err := strconv.ParseUint(code, 0, 16)
 	if err != nil {
-		return fmt.Errorf("Could not parse EDNS0 code: %s", err)
+		return nil, fmt.Errorf("Could not parse EDNS0 code: %s", err)
 	}
 	size, err := strconv.ParseUint(sizeStr, 10, 32)
 	if err != nil {
-		return fmt.Errorf("Could not parse EDNS0 data size: %s", err)
+		return nil, fmt.Errorf("Could not parse EDNS0 data size: %s", err)
 	}
 	start, err := strconv.ParseUint(startStr, 10, 32)
 	if err != nil {
-		return fmt.Errorf("Could not parse EDNS0 start index: %s", err)
+		return nil, fmt.Errorf("Could not parse EDNS0 start index: %s", err)
 	}
 	end, err := strconv.ParseUint(endStr, 10, 32)
 	if err != nil {
-		return fmt.Errorf("Could not parse EDNS0 end index: %s", err)
+		return nil, fmt.Errorf("Could not parse EDNS0 end index: %s", err)
 	}
 	if end <= start && end != 0 {
-		return fmt.Errorf("End index should be > start index (actual %d <= %d)", end, start)
+		return nil, fmt.Errorf("End index should be > start index (actual %d <= %d)", end, start)
 	}
 	if end > size && size != 0 {
-		return fmt.Errorf("End index should be <= size (actual %d > %d)", end, size)
+		return nil, fmt.Errorf("End index should be <= size (actual %d > %d)", end, size)
 	}
 	ednsType, ok := stringToEDNS0MapType[dataType]
 	if !ok {
-		return fmt.Errorf("Invalid dataType for EDNS0 map: %s", dataType)
+		return nil, fmt.Errorf("Invalid dataType for EDNS0 map: %s", dataType)
 	}
 	ecode := uint16(c)
-	p.options[ecode] = append(p.options[ecode], &edns0Map{name, ecode, ednsType, uint(size), uint(start), uint(end)})
+	return &edns0Map{name, ecode, ednsType, uint(size), uint(start), uint(end)}, nil
+}
+
+func (p *requestPlugin) addEDNS0Map(code, name, dataType, sizeStr, startStr, endStr string) error {
+	m, err := newEDNS0Map(code, name, dataType, sizeStr, startStr, endStr)
+	if err != nil {
+		return err
+	}
+	p.options[m.code] = append(p.options[m.code], m)
 	return nil
 }
