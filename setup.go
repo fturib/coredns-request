@@ -21,7 +21,7 @@ func setup(c *caddy.Controller) error {
 	r, err := parseRequest(c)
 
 	if err != nil {
-		return plugin.Error("policy", err)
+		return plugin.Error("request", err)
 	}
 
 	dnsserver.GetConfig(c).AddPlugin(func(next plugin.Handler) plugin.Handler {
@@ -47,6 +47,7 @@ func parseRequest(c *caddy.Controller) (*requestPlugin, error) {
 }
 
 func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
+	name := c.Val()
 	args := c.RemainingArgs()
 	// <label> <definition>
 	// <label> edns0 <id>
@@ -54,30 +55,29 @@ func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
 	// Valid encoded-format are hex (default), bytes, ip.
 
 	argsLen := len(args)
-	if argsLen != 3 && argsLen != 4 && argsLen != 7 {
+	if argsLen != 2 && argsLen != 3 && argsLen != 6 {
 		return fmt.Errorf("Invalid edns0 directive")
 	}
-	name := args[0]
-	code := args[2]
+	code := args[1]
 
 	dataType := "hex"
 	size := "0"
 	start := "0"
 	end := "0"
 
-	if argsLen > 3 {
-		dataType = args[3]
+	if argsLen > 2 {
+		dataType = args[2]
 	}
 
-	if argsLen == 7 && dataType == "hex" {
-		size = args[4]
-		start = args[5]
-		end = args[6]
+	if argsLen == 6 && dataType == "hex" {
+		size = args[3]
+		start = args[4]
+		end = args[5]
 	}
 
 	err := p.addEDNS0Map(code, name, dataType, size, start, end)
 	if err != nil {
-		return fmt.Errorf("Could not add EDNS0 map for %s: %s", args[0], err)
+		return fmt.Errorf("Could not add EDNS0 map for %s: %s", name, err)
 	}
 
 	return nil

@@ -180,3 +180,18 @@ func (o *edns0Map) makeHexString(b []byte) string {
 //		t.Errorf("expected exactly %d options remaining but got %d", 2, len(o.Option))
 //	}
 //}
+
+//m := makeTestDNSMsgWithEdns0("example.com", dns.TypeA, dns.ClassINET,
+//newEdns0(
+//newEdns0Local(0xfffd,
+//[]byte{
+//0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+//0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+//},
+//),
+//newEdns0Local(0xfffd, []byte{}),
+//newEdns0Local(0xfffe, []byte("test")),
+//newEdns0Local(0xfffc, []byte(net.ParseIP("2001:db8::1"))),
+//),
+//)
+//w := newTestAddressedNonwriter("192.0.2.1")
