@@ -15,7 +15,7 @@ request {
       client_id edns0 0xffed
       group_id edns0 0xffee hex 16 0 16
       <label> edns0 <id>
-      <label> ends0 <id> <encoded-format> <params of format ...>
+      <label> edns0 <id> <encoded-format> <params of format ...>
 }
 ~~~
 
