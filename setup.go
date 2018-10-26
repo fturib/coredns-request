@@ -56,7 +56,7 @@ func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
 
 	argsLen := len(args)
 	if argsLen != 2 && argsLen != 3 && argsLen != 6 {
-		return fmt.Errorf("Invalid edns0 directive")
+		return fmt.Errorf("invalid edns0 directive")
 	}
 	code := args[1]
 
@@ -77,7 +77,7 @@ func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
 
 	err := p.addEDNS0Map(code, name, dataType, size, start, end)
 	if err != nil {
-		return fmt.Errorf("Could not add EDNS0 map for %s: %s", name, err)
+		return fmt.Errorf("could not add EDNS0 map for %s: %s", name, err)
 	}
 
 	return nil
@@ -86,29 +86,29 @@ func (p *requestPlugin) parseEDNS0(c *caddy.Controller) error {
 func newEDNS0Map(code, name, dataType, sizeStr, startStr, endStr string) (*edns0Map, error) {
 	c, err := strconv.ParseUint(code, 0, 16)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse EDNS0 code: %s", err)
+		return nil, fmt.Errorf("could not parse EDNS0 code: %s", err)
 	}
 	size, err := strconv.ParseUint(sizeStr, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse EDNS0 data size: %s", err)
+		return nil, fmt.Errorf("could not parse EDNS0 data size: %s", err)
 	}
 	start, err := strconv.ParseUint(startStr, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse EDNS0 start index: %s", err)
+		return nil, fmt.Errorf("could not parse EDNS0 start index: %s", err)
 	}
 	end, err := strconv.ParseUint(endStr, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse EDNS0 end index: %s", err)
+		return nil, fmt.Errorf("could not parse EDNS0 end index: %s", err)
 	}
 	if end <= start && end != 0 {
-		return nil, fmt.Errorf("End index should be > start index (actual %d <= %d)", end, start)
+		return nil, fmt.Errorf("end index should be > start index (actual %d <= %d)", end, start)
 	}
 	if end > size && size != 0 {
-		return nil, fmt.Errorf("End index should be <= size (actual %d > %d)", end, size)
+		return nil, fmt.Errorf("end index should be <= size (actual %d > %d)", end, size)
 	}
 	ednsType, ok := stringToEDNS0MapType[dataType]
 	if !ok {
-		return nil, fmt.Errorf("Invalid dataType for EDNS0 map: %s", dataType)
+		return nil, fmt.Errorf("invalid dataType for EDNS0 map: %s", dataType)
 	}
 	ecode := uint16(c)
 	return &edns0Map{name, ecode, ednsType, uint(size), uint(start), uint(end)}, nil
