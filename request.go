@@ -76,7 +76,10 @@ func (p *requestPlugin) fillMetadata(ctx context.Context, state request.Request)
 	p.declareMetadata(QueryName, state.QName(), ctx)
 	p.declareMetadata(QueryType, dns.Type(state.QType()).String(), ctx)
 	p.declareMetadata(ClientIP, state.IP(), ctx)
-	//TOD - continue to fill the global variables.
+	p.declareMetadata(ServerIP, state.LocalIP(), ctx)
+	p.declareMetadata(ClientPort, state.Port(), ctx)
+	p.declareMetadata(ServerPort, state.LocalPort(), ctx)
+	p.declareMetadata(Protocol, state.Proto(), ctx)
 
 	p.getAttrsFromEDNS0(state.Req, ctx)
 
